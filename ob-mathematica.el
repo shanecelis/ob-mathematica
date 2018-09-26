@@ -4,6 +4,7 @@
 
 ;; Authors: Yi Wang
 ;; Keywords: literate programming, reproducible research
+;; Package-Version: 20150305.556
 ;; Homepage: https://github.com/tririver/wy-els/blob/master/ob-mathematica.el
 ;; Distributed under the GNU GPL v2 or later
 
@@ -23,12 +24,21 @@
 
 (defvar org-babel-default-header-args:mathematica '())
 
-(defvar org-babel-mathematica-command "MathematicaScript -script"
+(defcustom org-babel-mathematica-command "MathematicaScript -script"
+  "Name of the command for executing Mathematica code."
+  :type 'string
+  :group 'ob-mathematica)
+
+(defvar org-babel-mathematica-command-alt "math -noprompt"
   "Name of the command for executing Mathematica code.")
 
 (defun org-babel-expand-body:mathematica (body params)
   "Expand BODY according to PARAMS, return the expanded body."
-  (let ((vars (mapcar #'cdr (org-babel-get-header params :var))))
+;; https://github.com/gjkerns/ob-julia/issues/5
+
+  ;; (let ((vars (mapcar #'cdr (org-babel-get-header params :var))))
+  ;; (let ((vars (mapcar #'cdr (org-babel--get-vars params))))
+  (let ((vars (org-babel--get-vars params)))
     (concat
      (mapconcat ;; define any variables
       (lambda (pair)
@@ -42,7 +52,8 @@
 called by `org-babel-execute-src-block'"
   (let* ((result-params (cdr (assoc :result-params params)))
 	 (full-body (org-babel-expand-body:mathematica body params))
-	 (tmp-script-file (org-babel-temp-file "mathematica-")))
+	 (tmp-script-file (org-babel-temp-file "mathematica-"))
+	 (cmd org-babel-mathematica-command))
     ;; actually execute the source-code block 
     (with-temp-file tmp-script-file (insert full-body))
     ;; (with-temp-file "/tmp/dbg" (insert full-body))
@@ -53,7 +64,7 @@ called by `org-babel-execute-src-block'"
 		    (not (member "table" result-params))))
 	   raw
 	 (org-babel-script-escape (org-babel-trim raw))))
-    (org-babel-eval (concat org-babel-mathematica-command " " tmp-script-file) ""))))
+    (org-babel-eval (concat cmd " " tmp-script-file) ""))))
 
 (defun org-babel-prep-session:mathematica (session params)
   "This function does nothing so far"
@@ -73,3 +84,5 @@ specifying a variable of the same value."
 
 (provide 'ob-mathematica)
 
+
+;;; ob-mathematica.el ends here
