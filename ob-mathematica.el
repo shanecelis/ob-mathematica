@@ -29,15 +29,8 @@
   :type 'string
   :group 'ob-mathematica)
 
-(defvar org-babel-mathematica-command-alt "math -noprompt"
-  "Name of the command for executing Mathematica code.")
-
 (defun org-babel-expand-body:mathematica (body params)
   "Expand BODY according to PARAMS, return the expanded body."
-;; https://github.com/gjkerns/ob-julia/issues/5
-
-  ;; (let ((vars (mapcar #'cdr (org-babel-get-header params :var))))
-  ;; (let ((vars (mapcar #'cdr (org-babel--get-vars params))))
   (let ((vars (org-babel--get-vars params)))
     (concat
      (mapconcat ;; define any variables
